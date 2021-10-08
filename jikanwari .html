@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>共有１週間カレンダー</title>
+  <link rel="stylesheet" href="css/sample.css">
+</head>
+
+<body>
+  <header>
+    <h1>１週間時間割</h1>
+  </header>
+
+  <main>
+    <div class="main_01">
+      <!-- 月曜日 -->
+
+      <div>
+        <div class="day">月</div>
+        <!--重要なことを書く欄-->
+        <input type="text" id="input">
+        <!--時間割、メモを書く欄-->
+        <textarea id="text_area"></textarea>
+        <textarea id="text_area2"></textarea>
+        <textarea id="text_area15"></textarea>
+        <textarea id="text_area16"></textarea>
+
+      </div>
+      <!-- 火曜日 -->
+      <div>
+        <div class="day">火</div>
+        <!--重要なことを書く欄-->
+        <input type="text" id="input2">
+        <textarea id="text_area3"></textarea>
+        <textarea id="text_area4"></textarea>
+        <textarea id="text_area17"></textarea>
+        <textarea id="text_area18"></textarea>
+        <!-- <ul>
+          <li id="save2">Save</li>
+          <li id="clear2">Clear</li>
+        </ul> -->
+      </div>
+      <!-- 水曜日 -->
+      <div>
+        <div class="day">水</div>
+        <!--重要なことを書く欄-->
+        <input type="text" id="input3">
+        <textarea id="text_area5"></textarea>
+        <textarea id="text_area6"></textarea>
+        <textarea id="text_area19"></textarea>
+        <textarea id="text_area20"></textarea>
+        <!-- <ul>
+          <li id="save3">Save</li>
+          <li id="clear3">Clear</li>
+        </ul> -->
+      </div>
+      <!-- 木曜日 -->
+      <div>
+        <div class="day">木</div>
+        <!--重要なことを書く欄-->
+        <input type="text" id="input4">
+        <!--時間割、メモを書く欄-->
+        <textarea id="text_area7"></textarea>
+        <textarea id="text_area8"></textarea>
+        <textarea id="text_area21"></textarea>
+        <textarea id="text_area22"></textarea>
+        <!-- <ul>
+          <li id="save4">Save</li>
+          <li id="clear4">Clear</li>
+        </ul> -->
+      </div>
+      <!-- 金曜日 -->
+      <div>
+        <div class="day">金</div>
+        <!--重要なことを書く欄-->
+        <input type="text" id="input5">
+        <!--時間割、メモを書く欄-->
+        <textarea id="text_area9"></textarea>
+        <textarea id="text_area10"></textarea>
+        <textarea id="text_area23"></textarea>
+        <textarea id="text_area24"></textarea>
+        <!-- <ul>
+          <li id="save5">Save</li>
+          <li id="clear5">Clear</li>
+        </ul> -->
+      </div>
+      <!-- 土曜日 -->
+      <div>
+        <div class="day">土</div>
+        <!--重要なことを書く欄-->
+        <input type="text" id="input6">
+        <!--時間割、メモを書く欄-->
+        <textarea id="text_area11"></textarea>
+        <textarea id="text_area12"></textarea>
+        <textarea id="text_area25"></textarea>
+        <textarea id="text_area26"></textarea>
+        <!-- <ul>
+          <li id="save6">Save</li>
+          <li id="clear6">Clear</li>
+        </ul> -->
+      </div>
+      <!-- 日曜日 -->
+      <div>
+        <div class="day">日</div>
+        <!--重要なことを書く欄-->
+        <input type="text" id="input7">
+        <!--時間割、メモを書く欄-->
+        <textarea id="text_area13"></textarea>
+        <textarea id="text_area14"></textarea>
+        <textarea id="text_area27"></textarea>
+        <textarea id="text_area28"></textarea>
+        <!-- <ul>
+          <li id="save7">Save</li>
+          <li id="clear7">Clear</li>
+        </ul> -->
+      </div>
+    </div>
+    <ul>
+      <li id="save">Save</li>
+      <li id="clear">Clear</li>
+    </ul>
+  </main>
+
+
+  <footer>
+    <small></small>
+  </footer>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <!-- 以下にfirebaseのコード -->
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.1/firebase-app.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+    // 追加
+    import {
+      getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot,
+    } from
+      "https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore.js";
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "",
+      authDomain: "jikanwari-9d531.firebaseapp.com",
+      projectId: "jikanwari-9d531",
+      storageBucket: "jikanwari-9d531.appspot.com",
+      messagingSenderId: "578105217919",
+      appId: "1:578105217919:web:6abca10f16aed67c69c04a"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+
+    // 追加
+    const db = getFirestore(app);
+
+    // まずデータ取得の条件を設定
+    const q = query(collection(db, 'jikanwari'), orderBy('time', 'desc'));
+    // ↓onSnapshotでcloud firestoreのデータ変更時に実行される！
+    onSnapshot(q, (querySnapshot) => {
+      // querySnapshot.docsにcloud firestoreのデータが配列形式で入る
+      const dataArray = []; // 必要なデータだけが入った新しい配列を作成
+      querySnapshot.docs.forEach(function (doc) {
+        const data = {
+          id: doc.id,
+          data: doc.data(),
+        }
+        dataArray.push(data);
+      });
+      // console.log(dataArray);
+      // 表示用の配列を準備
+      const tagArray = []; // `dataArray`は前回出てきたオブジェクトの配列
+      dataArray.forEach(function (data) {
+
+        tagArray.push(`
+          <li id=${data.id}>
+            <p>${data.data.title}</p>
+            <p>${data.data.text}</p>
+            <p>${data.data.text2}</p>
+            <p>${data.data.text15}</p>
+            <p>${data.data.text16}</p>
+
+            <p>${data.data.title2}</p>
+            <p>${data.data.text3}</p>
+            <p>${data.data.text4}</p>
+            <p>${data.data.text17}</p>
+            <p>${data.data.text18}</p>
+
+            <p>${data.data.title3}</p>
+            <p>${data.data.text5}</p>
+            <p>${data.data.text6}</p>
+            <p>${data.data.text19}</p>
+            <p>${data.data.text20}</p>
+
+            <p>${data.data.title4}</p>
+            <p>${data.data.text7}</p>
+            <p>${data.data.text8}</p>
+            <p>${data.data.text21}</p>
+            <p>${data.data.text22}</p>
+
+            <p>${data.data.title5}</p>
+            <p>${data.data.text9}</p>
+            <p>${data.data.text10}</p>
+            <p>${data.data.text23}</p>
+            <p>${data.data.text24}</p>
+
+            <p>${data.data.title6}</p>
+            <p>${data.data.text11}</p>
+            <p>${data.data.text12}</p>
+            <p>${data.data.text25}</p>
+            <p>${data.data.text26}</p>
+
+            <p>${data.data.title7}</p>
+            <p>${data.data.text13}</p>
+            <p>${data.data.text14}</p>
+            <p>${data.data.text27}</p>
+            <p>${data.data.text28}</p>
+          
+          </li>
+        `)
+      })
+      $('#output').html(tagArray.join(''));
+    });
+
+
+    //1.Save クリックイベント
+    $("#save").on("click", function () {
+      // alert("送信")
+      const data = {
+        // 月
+        title: $("#input").val(),
+        text: $("#text_area").val(),
+        text2: $("#text_area2").val(),
+        text15: $("#text_area15").val(),
+        text16: $("#text_area16").val(),
+        // 火
+        title2: $("#input2").val(),
+        text3: $("#text_area3").val(),
+        text4: $("#text_area4").val(),
+        text17: $("#text_area17").val(),
+        text18: $("#text_area18").val(),
+        // 水
+        title3: $("#input3").val(),
+        text5: $("#text_area5").val(),
+        text6: $("#text_area6").val(),
+        text19: $("#text_area19").val(),
+        text20: $("#text_area20").val(),
+        // 木
+        title4: $("#input4").val(),
+        text7: $("#text_area7").val(),
+        text8: $("#text_area8").val(),
+        text21: $("#text_area21").val(),
+        text22: $("#text_area22").val(),
+        // 金
+        title5: $("#input5").val(),
+        text9: $("#text_area9").val(),
+        text10: $("#text_area10").val(),
+        text23: $("#text_area23").val(),
+        text24: $("#text_area24").val(),
+        // 土
+        title6: $("#input6").val(),
+        text11: $("#text_area11").val(),
+        text12: $("#text_area12").val(),
+        text25: $("#text_area25").val(),
+        text26: $("#text_area26").val(),
+        // 日
+        title7: $("#input7").val(),
+        text13: $("#text_area13").val(),
+        text14: $("#text_area14").val(),
+        text27: $("#text_area27").val(),
+        text28: $("#text_area28").val()
+      }
+      // console.log(data);
+      const jsonData = JSON.stringify(data);
+      localStorage.setItem("memo", jsonData);
+      // データを送る
+      addDoc(collection(db, 'jikanwari'), {
+        // 月
+        title: $("#input").val(),
+        text: $("#text_area").val(),
+        text2: $("#text_area2").val(),
+        text15: $("#text_area15").val(),
+        text16: $("#text_area16").val(),
+        // 火
+        title2: $("#input2").val(),
+        text3: $("#text_area3").val(),
+        text4: $("#text_area4").val(),
+        text17: $("#text_area17").val(),
+        text18: $("#text_area18").val(),
+        // 水
+        title3: $("#input3").val(),
+        text5: $("#text_area5").val(),
+        text6: $("#text_area6").val(),
+        text19: $("#text_area19").val(),
+        text20: $("#text_area20").val(),
+        // 木
+        title4: $("#input4").val(),
+        text7: $("#text_area7").val(),
+        text8: $("#text_area8").val(),
+        text21: $("#text_area21").val(),
+        text22: $("#text_area22").val(),
+        // 金
+        title5: $("#input5").val(),
+        text9: $("#text_area9").val(),
+        text10: $("#text_area10").val(),
+        text23: $("#text_area23").val(),
+        text24: $("#text_area24").val(),
+        // 土   
+        title6: $("#input6").val(),
+        text11: $("#text_area11").val(),
+        text12: $("#text_area12").val(),
+        text25: $("#text_area25").val(),
+        text26: $("#text_area26").val(),
+        // 日
+        title7: $("#input7").val(),
+        text13: $("#text_area13").val(),
+        text14: $("#text_area14").val(),
+        text27: $("#text_area27").val(),
+        text28: $("#text_area28").val()
+      });
+    });
+  </script>
+  <script>
+
+
+
+
+    //2.clear クリックイベント
+    $("#clear").on("click", function () {
+      localStorage.removeItem("memo");
+      // 月
+      $("#input").val('');
+      $("#text_area").val('');
+      $("#text_area2").val('');
+      $("#text_area15").val('');
+      $("#text_area16").val('');
+      // 火
+      $("#input2").val('');
+      $("#text_area3").val('');
+      $("#text_area4").val('');
+      $("#text_area17").val('');
+      $("#text_area18").val('');
+      // 水
+      $("#input3").val('');
+      $("#text_area5").val('');
+      $("#text_area6").val('');
+      $("#text_area19").val('');
+      $("#text_area20").val('');
+      // 木
+      $("#input4").val('');
+      $("#text_area7").val('');
+      $("#text_area8").val('');
+      $("#text_area21").val('');
+      $("#text_area22").val('');
+      // 金
+      $("#input5").val('');
+      $("#text_area9").val('');
+      $("#text_area10").val('');
+      $("#text_area23").val('');
+      $("#text_area24").val('');
+      // 土
+      $("#input6").val('');
+      $("#text_area11").val('');
+      $("#text_area12").val('');
+      $("#text_area25").val('');
+      $("#text_area26").val('');
+      // 日
+      $("#input7").val('');
+      $("#text_area13").val('');
+      $("#text_area14").val('');
+      $("#text_area27").val('');
+      $("#text_area28").val('');
+
+    });
+
+
+    //3.ページ読み込み：保存データ取得表示
+    if (localStorage.getItem("memo")) {
+      const jsonData = localStorage.getItem("memo");
+      const data = JSON.parse(jsonData);
+      // 月
+      $("#input").val(data.title);
+      $("#text_area").val(data.text);
+      $("#text_area2").val(data.text2);
+      $("#text_area15").val(data.text15);
+      $("#text_area16").val(data.text16);
+      // 火
+      $("#input2").val(data.title2);
+      $("#text_area3").val(data.text3);
+      $("#text_area4").val(data.text4);
+      $("#text_area17").val(data.text17);
+      $("#text_area18").val(data.text18);
+      // 水
+      $("#input3").val(data.title3);
+      $("#text_area5").val(data.text5);
+      $("#text_area6").val(data.text6);
+      $("#text_area19").val(data.text19);
+      $("#text_area20").val(data.text20);
+      // 木
+      $("#input4").val(data.title4);
+      $("#text_area7").val(data.text7);
+      $("#text_area8").val(data.text8);
+      $("#text_area21").val(data.text21);
+      $("#text_area22").val(data.text22);
+      // 金
+      $("#input5").val(data.title5);
+      $("#text_area9").val(data.text9);
+      $("#text_area10").val(data.text10);
+      $("#text_area23").val(data.text23);
+      $("#text_area24").val(data.text24);
+      // 土
+      $("#input6").val(data.title6);
+      $("#text_area11").val(data.text11);
+      $("#text_area12").val(data.text12);
+      $("#text_area25").val(data.text25);
+      $("#text_area26").val(data.text26);
+      // 日
+      $("#input7").val(data.title7);
+      $("#text_area13").val(data.text13);
+      $("#text_area14").val(data.text14);
+      $("#text_area27").val(data.text27);
+      $("#text_area28").val(data.text28);
+
+    };
+
+  </script>
+
+
+</body>
+
+</html>
